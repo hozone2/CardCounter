@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,8 @@ public class MainActivity extends AppCompatActivity {
     RequestQueue requestQueue;  // This is our requests queue to process our HTTP requests.    RequestQueue requestQueue;
     String baseUrl = "https://github.com/crobertsbmw/deckofcards.git";
     String url_shuffle = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
+    String currentDeckId;
+    ImageView cardImage;
 
 
     @Override
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         get_card_id.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getRepoList();
+                shuffleDeck();
             }
         });
         hide.setOnClickListener(new View.OnClickListener() {
@@ -92,14 +95,8 @@ public class MainActivity extends AppCompatActivity {
         // We will use this to write a "No repos found" message if the user doens't have any.
         this.tvRepoList.setText(str);
     }
-    private void getRepoList() {
-        // First, we insert the username into the repo url.
-        // The repo url is defined in GitHubs API docs (https://developer.github.com/v3/repos/).
-        //this.url = this.baseUrl + username + "/repos";
-
-        // Next, we create a new JsonArrayRequest. This will use Volley to make a HTTP request
-        // that expects a JSON Array Response.
-        // To fully understand this, I'd recommend reading the office docs: https://developer.android.com/training/volley/index.html
+    private void shuffleDeck() {
+   // To fully understand this, I'd recommend reading the office docs: https://developer.android.com/training/volley/index.html
         JsonObjectRequest arrReq = new JsonObjectRequest(
                 Request.Method.GET,
                 url_shuffle,
@@ -108,7 +105,42 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            cardCount.setText(response.getString("deck_id"));
+                            currentDeckId = response.getString("deck_id")
+                        } catch (Exception e) {
+
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }
+
+        );
+        // Add the request we just defined to our request queue.
+        // The request queue will automatically handle the request as soon as it can.
+        requestQueue.add(arrReq);
+    }
+    private void drawACard(final int totalCount) {
+        String url_drawCard = "https://deckofcardsapi.com/api/deck/" + currentDeckId + "/draw/?count=2";
+        private String getValue;
+        JsonObjectRequest arrReq = new JsonObjectRequest(
+                Request.Method.GET,
+                url_drawCard,
+                null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            cardImage.setImageAlpha(response.getString("image"));
+                            getValue = response.getString("value");
+                            if (getValue == "KING" || getValue == "QUEEN" || getValue == "JACK" || getValue == "10" || getValue == "ACE") {
+                                totalCount--;
+                            }
+                            if (getValue == "2" || getValue == "3" || getValue == "4" || getValue == "5" || getValue == "6") {
+                                totalCount++;
+                            }
                         } catch (Exception e) {
 
                         }

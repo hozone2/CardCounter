@@ -1,5 +1,6 @@
 package com.example.hikaru.cardcounter;
 
+import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
@@ -10,6 +11,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.net.URL;
+import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 
 
 import com.android.volley.RequestQueue;
@@ -124,7 +128,9 @@ public class MainActivity extends AppCompatActivity {
     }
     public void drawACard(final int totalCount) {
         String url_drawCard = "https://deckofcardsapi.com/api/deck/" + currentDeckId + "/draw/?count=2";
-        String getValue;
+        //String getValue;
+       // ImageView imageView;
+
         JsonObjectRequest arrReq = new JsonObjectRequest(
                 Request.Method.GET,
                 url_drawCard,
@@ -133,15 +139,20 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            cardImage.setImageURI(("image"));
-                            getValue = response.getString("value");
+                            ImageView imageView = (ImageView)findViewById(R.id.imageView2);
+                            URL url = new URL(response.getString("image"));
+                            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                            imageView.setImageBitmap(bmp);
+
+                            String getValue = response.getString("value");
+                            int a = totalCount;
                             if (getValue == "KING" || getValue == "QUEEN" || getValue == "JACK" || getValue == "10" || getValue == "ACE") {
-                                totalCount--;
+                                a--;
                             }
                             if (getValue == "2" || getValue == "3" || getValue == "4" || getValue == "5" || getValue == "6") {
-                                totalCount++;
+                                a++;
                             }
-                            cardCount.setText(totalCount);
+                            cardCount.setText(a);
                         } catch (Exception e) {
 
                         }

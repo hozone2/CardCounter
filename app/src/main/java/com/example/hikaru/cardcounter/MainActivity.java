@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         // We will use this to write a "No repos found" message if the user doens't have any.
         this.tvRepoList.setText(str);
     }
-    private void shuffleDeck() {
+    public void shuffleDeck() {
    // To fully understand this, I'd recommend reading the office docs: https://developer.android.com/training/volley/index.html
         JsonObjectRequest arrReq = new JsonObjectRequest(
                 Request.Method.GET,
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            currentDeckId = response.getString("deck_id")
+                            currentDeckId = response.getString("deck_id");
                         } catch (Exception e) {
 
                         }
@@ -122,9 +122,9 @@ public class MainActivity extends AppCompatActivity {
         // The request queue will automatically handle the request as soon as it can.
         requestQueue.add(arrReq);
     }
-    private void drawACard(final int totalCount) {
+    public void drawACard(final int totalCount) {
         String url_drawCard = "https://deckofcardsapi.com/api/deck/" + currentDeckId + "/draw/?count=2";
-        private String getValue;
+        String getValue;
         JsonObjectRequest arrReq = new JsonObjectRequest(
                 Request.Method.GET,
                 url_drawCard,
@@ -133,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            cardImage.setImageAlpha(response.getString("image"));
+                            cardImage.setImageURI(("image"));
                             getValue = response.getString("value");
                             if (getValue == "KING" || getValue == "QUEEN" || getValue == "JACK" || getValue == "10" || getValue == "ACE") {
                                 totalCount--;
@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
                             if (getValue == "2" || getValue == "3" || getValue == "4" || getValue == "5" || getValue == "6") {
                                 totalCount++;
                             }
+                            cardCount.setText(totalCount);
                         } catch (Exception e) {
 
                         }

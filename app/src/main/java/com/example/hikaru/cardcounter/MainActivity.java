@@ -1,5 +1,6 @@
 package com.example.hikaru.cardcounter;
 
+import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -14,6 +15,15 @@ import android.widget.Toast;
 import java.net.URL;
 import android.graphics.BitmapFactory;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Closeable;
 
 
 import com.android.volley.RequestQueue;
@@ -30,7 +40,9 @@ import org.json.JSONObject;
 import org.json.JSONException;
 
 
+
 public class MainActivity extends AppCompatActivity {
+
 
     Button hide;
     Button show;
@@ -44,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     String url_shuffle = "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1";
     String currentDeckId;
     ImageView cardImage;
-
+    TextView card;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,19 +66,19 @@ public class MainActivity extends AppCompatActivity {
 //        this.etGitHubUser = (EditText) findViewById(R.id.et_github_user);  // Link our github user text box.
 //        this.btnGetRepos = (Button) findViewById(R.id.btn_get_repos);  // Link our clicky button.
 //        this.tvRepoList = (TextView) findViewById(R.id.tv_repo_list);  // Link our repository list text output box.
-        this.tvRepoList.setMovementMethod(new ScrollingMovementMethod());  // This makes our text box scrollable, for those big GitHub contributors with lots of repos :)
 
         requestQueue = Volley.newRequestQueue(this);  // This setups up a new request queue which we will need to make HTTP requests.
-        get_card_id = findViewById(R.id.get_card_id);
+//        get_card_id = findViewById(R.id.get_card_id);
         hide = (Button) findViewById(R.id.hide);
         show = (Button) findViewById(R.id.show);
         cardCount = (TextView) findViewById(R.id.Count);
-        get_card_id.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                shuffleDeck();
-            }
-        });
+        card = (TextView) findViewById(R.id.card);
+//        get_card_id.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                shuffleDeck();
+//            }
+//        });
         hide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -110,6 +122,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             currentDeckId = response.getString("deck_id");
+                            card.setText(currentDeckId);
+
                         } catch (Exception e) {
 
                         }
@@ -139,10 +153,14 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            ImageView imageView = (ImageView)findViewById(R.id.imageView2);
-                            URL url = new URL(response.getString("image"));
-                            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
-                            imageView.setImageBitmap(bmp);
+                            String imagea = response.getString("image");
+
+
+
+//                            ImageView imageView = (ImageView)findViewById(R.id.imageView2);
+//                            URL url = new URL(response.getString("image"));
+//                            Bitmap bmp = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+//                            imageView.setImageBitmap(bmp);
 
                             String getValue = response.getString("value");
                             int a = totalCount;
@@ -169,6 +187,7 @@ public class MainActivity extends AppCompatActivity {
         // The request queue will automatically handle the request as soon as it can.
         requestQueue.add(arrReq);
     }
+
     public void getReposClicked(View v) {
         // Clear the repo list (so we have a fresh screen to add to)
         clearRepoList();
@@ -176,6 +195,19 @@ public class MainActivity extends AppCompatActivity {
         // text which has been entered into the etGitHubUser text input field.
 //        getRepoList(etGitHubUser.getText().toString());
     }
+
+    public void Game() {
+        int totalCount;
+
+        totalCount = 0;
+        shuffleDeck();
+        for (int i = 0; i < 52; i++) {
+            drawACard(totalCount);
+            //time iteration;
+        }
+
+    }
+
 }
 
 
